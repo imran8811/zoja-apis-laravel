@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Profile;
 
 class ProfileController extends Controller
 {
@@ -11,8 +12,7 @@ class ProfileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index(){
         //
     }
 
@@ -41,10 +41,41 @@ class ProfileController extends Controller
             'motherLanguage' => 'required',
             'requirements' => 'required',
             'jobTitle' => 'required',
-            'noOfSone' => 'required',
+            'noOfSons' => 'required',
             'noOfDaughters' => 'required',
             'userId' => 'required' 
         ]);
+
+        $profile = Profile::create([
+            'contactNo' => $formFields['contactNo'],
+            'professionType' => $formFields['professionType'],
+            'income' => $formFields['income'],
+            'religion' => $formFields['religion'],
+            'caste' => $formFields['caste'],
+            'degreeLevel' => $formFields['degreeLevel'],
+            'institute' => $formFields['institute'],
+            'country' => $formFields['country'],
+            'city' => $formFields['city'],
+            'status' => $formFields['status'],
+            'age' => $formFields['age'],
+            'complexion' => $formFields['complexion'],
+            'weight' => $formFields['weight'],
+            'feet' => $formFields['feet'],
+            'inch' => $formFields['inch'],
+            'motherLanguage' => $formFields['motherLanguage'],
+            'requirements' => $formFields['requirements'],
+            'jobTitle' => $formFields['jobTitle'],
+            'noOfSons' => $formFields['noOfSons'],
+            'noOfDaughters' => $formFields['noOfDaughters'],
+            'userId' => $formFields['userId'] 
+        ]);
+
+        $response = [
+            'type' => 'success'
+        ];
+
+        return response ($response);
+
     }
 
     /**
@@ -53,8 +84,7 @@ class ProfileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         //
     }
 
@@ -87,8 +117,7 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         //
     }
 
@@ -98,8 +127,7 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
         //
     }
 }

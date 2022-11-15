@@ -26,7 +26,7 @@ class Profile extends Model {
         'motherLanguage',
         'requirements',
         'jobTitle',
-        'noOfSone',
+        'noOfSons',
         'noOfDaughters',
         'userId'
     ];
