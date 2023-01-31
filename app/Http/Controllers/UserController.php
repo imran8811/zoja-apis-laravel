@@ -4,35 +4,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
+use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
+use Auth;
+
 
 class UserController extends Controller {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(){
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request){
         $user = new User;
 
         $formFields = $request->validate([
-            'type' => 'required | string',
             'fullName' => 'required | string',
             'email' => 'required | string | unique:users',
             'password' => 'required',
         ]);
 
         $user = User::create([
-            'type' => $formFields['type'],
             'fullName' => $formFields['fullName'],
             'email' => $formFields['email'],
             'password' => bcrypt($formFields['password']),
@@ -49,69 +37,68 @@ class UserController extends Controller {
         return response($response);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function login(Request $request){
         $fields = $request->validate([
             'email' => 'required | email',
             'password' => 'required'
         ]);
         $user = User::where('email', $request->email)->first();
-        if(!$user || !Hash::check($fields['password'], $user->password)){
+        if(!$user){
             return response([
-                'message' => 'Invalid Credentials'
+                'errorType' => 'user',
+                'message' => 'User Not Found'
+            ], 401);
+        } else if(!Hash::check($fields['password'], $user->password)){
+            return response([
+                'errorType' => 'password',
+                'message' => 'Wrong Password'
             ], 401);
         }
         $token = $user->createToken('myapptoken')->plainTextToken;
         $response = [
             'type' => 'success',
-            'user' => $user,
+            'id' => $user->id,
+            'fullName' => $user->fullName,
+            'membership' => $user->membership,
+            'profileScore' => $user->profile_score,
+            'state' => $user->state,
             'token' => $token
         ];
         return response($response);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id){
-        //
+    public function updateProfileScore($id){
+        $newProfileScore = '90';
+        $profileScoreUpdated = User::where('id', $id)->update(['profile_score' => $newProfileScore]);
+        return response($profileScoreUpdated);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id){
-        //
+    public function deleteUserById($id){
+        $userDeleted = User::where('id', $id)->delete();
+        if($userDeleted === 1) {
+            $profileDeleted = Profile::where('userId', $id)->delete();
+            if($profileDeleted === 1){
+                $response = [
+                    'type' => 'Success',
+                    'message' => 'User deleted successfuly'
+                ];
+                return response($userDeleted);
+            } else {
+                $response = [
+                    'type' => 'Error',
+                    'message' => 'Unable to delete profile, try later'
+                ];
+                return response($response);
+            }
+        } else {
+            $response = [
+                'type' => 'Error',
+                'message' => 'Unable to delete user, try later'
+            ];
+            return response($response);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id){
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function logout() {
         Auth::guard('web')->logout();
         return response ([

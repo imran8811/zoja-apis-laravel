@@ -18,9 +18,10 @@ return new class extends Migration
             $table->string('fullName');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('state');
-            $table->string('membership');
-            $table->string('profileScore');
+            $table->string('state')->default('0');
+            $table->string('favourite_profiles')->nullable();
+            $table->string('membership')->default('0');
+            $table->string('profile_score')->default('0');
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
