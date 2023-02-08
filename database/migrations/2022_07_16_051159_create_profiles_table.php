@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up() {
         Schema::create('profiles', function (Blueprint $table) {
+            $table->string('fullName');
             $table->string('profileType');
             $table->string('contactNo');
             $table->string('professionType');
+            $table->string('professionTitle');
+            $table->string('jobBusinessLocation');
             $table->string('income');
             $table->string('religion');
             $table->string('subReligion');
@@ -26,7 +29,6 @@ return new class extends Migration {
             $table->string('inch');
             $table->string('motherLanguage');
             $table->string('requirements');
-            $table->string('jobTitle');
             $table->string('noOfSons');
             $table->string('noOfDaughters');
             $table->string('userId');

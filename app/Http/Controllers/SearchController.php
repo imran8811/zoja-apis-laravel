@@ -11,10 +11,8 @@ class SearchController extends Controller {
 
 	public function searchProfile(Request $request){
 		$users = User::join('profiles', 'profiles.userId', '=', 'users.id')
-					->where('profileType', $request->type)
+					->where('profileType', $request->profileType)
 					->get();
-		// $getUser = User::where('type', $request->type)->get();
-		// $getProfiles = Profile::where('')
 		return response($users);
 	}
 }

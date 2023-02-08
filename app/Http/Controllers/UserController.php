@@ -15,13 +15,11 @@ class UserController extends Controller {
         $user = new User;
 
         $formFields = $request->validate([
-            'fullName' => 'required | string',
             'email' => 'required | string | unique:users',
             'password' => 'required',
         ]);
 
         $user = User::create([
-            'fullName' => $formFields['fullName'],
             'email' => $formFields['email'],
             'password' => bcrypt($formFields['password']),
         ]);
@@ -58,7 +56,6 @@ class UserController extends Controller {
         $response = [
             'type' => 'success',
             'id' => $user->id,
-            'fullName' => $user->fullName,
             'membership' => $user->membership,
             'profileScore' => $user->profile_score,
             'state' => $user->state,
@@ -68,35 +65,74 @@ class UserController extends Controller {
     }
 
     public function updateProfileScore($id){
-        $newProfileScore = '90';
+        $newProfileScore = '80';
         $profileScoreUpdated = User::where('id', $id)->update(['profile_score' => $newProfileScore]);
         return response($profileScoreUpdated);
     }
 
-    public function deleteUserById($id){
-        $userDeleted = User::where('id', $id)->delete();
-        if($userDeleted === 1) {
-            $profileDeleted = Profile::where('userId', $id)->delete();
-            if($profileDeleted === 1){
-                $response = [
-                    'type' => 'Success',
-                    'message' => 'User deleted successfuly'
-                ];
-                return response($userDeleted);
-            } else {
-                $response = [
-                    'type' => 'Error',
-                    'message' => 'Unable to delete profile, try later'
-                ];
-                return response($response);
-            }
+    public function updatePassword(Request $request){
+        $user = User::where('id', $request->route('id'))->first();
+        if($user){
+          if(Hash::check($request->oldPassword, $user->password)){
+            $user->update(['password' => bcrypt($request->newPassword)]);
+            return response([
+                'type' => 'success',
+                'message' => 'Password has been updated'
+            ]);
+          } else {
+            return response([
+                'type' => 'error',
+                'message' => 'Old Password is not correct'
+            ], 401);
+          }
         } else {
-            $response = [
-                'type' => 'Error',
-                'message' => 'Unable to delete user, try later'
-            ];
-            return response($response);
+            return response([
+                'type' => 'error',
+                'message' => 'User Not Found'
+            ], 401);
         }
+    }
+
+    public function updateEmail(Request $request){
+      $user = User::where('id', $request->route('id'))->first();
+      if($user){
+        if($user->email !== $request->email) {
+          $updateEmail = $user->update(['email' => $request->email]);
+          if($updateEmail){
+            return response([
+              'type' => 'success',
+              'message' => 'Email has been updated'
+            ]);
+          } else {
+            return response([
+              'type' => 'error',
+              'message' => 'Unable to update email, try later'
+            ], 401);
+          }
+        } else {
+          return response([
+            'type' => 'error',
+            'message' => 'New email is same as Old'
+          ], 401);
+        }
+      } else {
+        return response([
+          'type' => 'error',
+          'message' => 'User Not Found'
+        ], 401);
+      }
+    }
+
+    public function getUserById(Request $request){
+      $user = User::where('id', $request->route('id'))->first();
+      if($user){
+        return response($user);
+      } else {
+        return response([
+          'type' => 'error',
+          'message' => 'User not found'
+        ]);
+      }
     }
 
     public function logout() {

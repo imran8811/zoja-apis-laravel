@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Profile extends Model {
     use HasFactory;
     protected $fillable = [
+        'fullName',
         'profileType',
         'contactNo',
         'professionType',
+        'professionTitle',
+        'jobBusinessLocation',
         'income',
         'religion',
         'subReligion',
@@ -27,7 +30,6 @@ class Profile extends Model {
         'inch',
         'motherLanguage',
         'requirements',
-        'jobTitle',
         'noOfSons',
         'noOfDaughters',
         'userId',
