@@ -8,7 +8,6 @@ use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
 
 class SearchController extends Controller {
-
 	public function searchProfile(Request $request){
 		$users = User::join('profiles', 'profiles.userId', '=', 'users.id')
 					->where('profileType', $request->profileType)

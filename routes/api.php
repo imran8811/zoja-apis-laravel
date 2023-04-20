@@ -18,11 +18,10 @@ use App\Http\Controllers\ProfileController;
 */
 
 //User Routes
-Route::post('/user/register', [UserController::class, 'create']);
+Route::post('/user/create', [UserController::class, 'create']);
 Route::post('/user/login', [UserController::class, 'login']);
 Route::post('/user/logout', [UserController::class, 'logout']);
 Route::get('/user/{id}', [UserController::class, 'getUserById']);
-
 Route::patch('/user/update-password/{id}', [UserController::class, 'updatePassword']);
 Route::patch('/user/update-email/{id}', [UserController::class, 'updateEmail']);
 // Route::patch('/user/reset-password/{id}', [UserController::class, 'resetPassword']);

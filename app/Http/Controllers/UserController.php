@@ -13,32 +13,36 @@ class UserController extends Controller {
 
     public function create(Request $request){
         $user = new User;
-
         $formFields = $request->validate([
+            'fullName' => 'required | string',
+            'gender' => 'required | string',
             'email' => 'required | string | unique:users',
             'password' => 'required',
         ]);
-
         $user = User::create([
+            'fullName' => $formFields['fullName'],
+            'gender' => $formFields['gender'],
             'email' => $formFields['email'],
             'password' => bcrypt($formFields['password']),
+            'profile_score' => 20
         ]);
-
         $token = $user->createToken('myapptoken')->plainTextToken;
-
         $response = [
             'type' => 'success',
             'token' => $token,
-            'user' => $user
+            'user' => [
+            'id' => bcrypt($user->id),
+            'profileScore' => $user->profile_score,
+            'fullName' => $user->fullName,
+          ]
         ];
-
         return response($response);
     }
 
     public function login(Request $request){
         $fields = $request->validate([
-            'email' => 'required | email',
-            'password' => 'required'
+          'email' => 'required | email',
+          'password' => 'required'
         ]);
         $user = User::where('email', $request->email)->first();
         if(!$user){

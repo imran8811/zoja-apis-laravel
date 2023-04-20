@@ -3,45 +3,87 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Profile;
 use App\Models\User;
-use App\Models\FavouriteProfiles;
+use App\Models\Personal;
+use App\Models\Profession;
+use App\Models\Education;
+use App\Models\Religion;
+use App\Models\Appearance;
+use App\Models\Location;
+use App\Models\Family;
+use App\Models\Others;
 
 use App\Http\Controllers\UserController;
 
 class ProfileController extends Controller {
 
     public function create(Request $request){
-      $formFields = $request->validate([
-          'fullName' => 'required',
-          'profileType' => 'required',
+      if($request->step === 'login'){
+        $formFields = $request->validate([
+          'fullName' => 'required | string',
+          'gender' => 'required | string',
+          'email' => 'required | string | unique:users',
+          'password' => 'required',
+        ]);
+        $response = $this->createStepLogin($formFields);
+        return response($response);
+      } else if($request->step === 'personal'){
+        $formFields = $request->validate([
           'contactNo' => 'required',
+          'caste' => 'required',
+          'motherLanguage' => 'required',
+          'maritalStatus' => 'required',
+        ]);
+        $response = $this->createStepPersonal($formFields);
+        return response($response);
+      } else if($request->step === 'profession'){
+        $formFields = $request->validate([
           'professionType' => 'required',
           'professionTitle' => 'required',
-          'jobBusinessLocation' => 'required',
           'income' => 'required',
-          'religion' => 'required',
-          'subReligion' => 'required',
-          'caste' => 'required',
+        ]);
+        $response = $this->createStepProfession($formFields);
+        return response($response);
+      } else if($request->step === 'education'){
+        $formFields = $request->validate([
           'degreeLevel' => 'required',
           'degreeType' => 'required',
           'degreeYear' => 'required',
           'institute' => 'required',
-          'maritalStatus' => 'required',
+        ]);
+        $response = $this->createStepEducation($formFields);
+        return response($response);
+      } else if($request->step === 'religion'){
+        $formFields = $request->validate([
+          'religion' => 'required',
+          'subReligion' => 'required',
+        ]);
+        $response = $this->createStepReligion($formFields);
+        return response($response);
+      } else if($request->step === 'appearance'){
+        $formFields = $request->validate([
           'age' => 'required',
           'complexion' => 'required',
           'weight' => 'required',
           'feet' => 'required',
           'inch' => 'required',
-          'motherLanguage' => 'required',
-          'requirements' => 'required',
-          'noOfSons' => 'required',
-          'noOfDaughters' => 'required',
-          'userId' => 'required',
           'headType' => 'required', 
-          'smoker' => 'required',
-          'drinker' => 'required',
-          'childProducer' => 'required', 
+        ]);
+        $response = $this->createStepAppearance($formFields);
+        return response($response);
+      } else if($request->step === 'location'){
+        $formFields = $request->validate([
+          'currentAddessArea' => 'required', 
+          'currentAddessCity' => 'required', 
+          'currentAddessCountry' => 'required', 
+          'permanentAddessArea' => 'required', 
+          'permanentAddessCity' => 'required', 
+          'permanentAddessCountry' => 'required', 
+        ]);
+        $response = $this->createStepLocation($formFields);
+        return response($response);
+      } else if($request->step === 'family'){
+        $formFields = $request->validate([ 
           'father' => 'required',
           'mother' => 'required',
           'sisters' => 'required', 
@@ -49,78 +91,23 @@ class ProfileController extends Controller {
           'brothers' => 'required', 
           'marriedBrothers' => 'required', 
           'siblingNumber' => 'required', 
-          'currentAddessArea' => 'required', 
-          'currentAddessCity' => 'required', 
-          'currentAddessCountry' => 'required', 
-          'permanentAddessArea' => 'required', 
-          'permanentAddessCity' => 'required', 
-          'permanentAddessCountry' => 'required', 
-      ]);
-
-      if(Profile::where('userId', $formFields['userId'])->first()){
-          $response = [
-              'type' => 'error',
-              'message' => 'Profile already exists'
-          ];
-          return response($response);
-      } else {
-        $profile = Profile::create([
-          'fullName' => $formFields['fullName'],
-          'profileType' => $formFields['profileType'],
-          'contactNo' => $formFields['contactNo'],
-          'professionType' => $formFields['professionType'],
-          'professionTitle' => $formFields['professionTitle'],
-          'jobBusinessLocation' => $formFields['jobBusinessLocation'],
-          'income' => $formFields['income'],
-          'religion' => $formFields['religion'],
-          'subReligion' => $formFields['subReligion'],
-          'caste' => $formFields['caste'],
-          'degreeLevel' => $formFields['degreeLevel'],
-          'degreeType' => $formFields['degreeType'],
-          'degreeYear' => $formFields['degreeYear'],
-          'institute' => $formFields['institute'],
-          'maritalStatus' => $formFields['maritalStatus'],
-          'age' => $formFields['age'],
-          'complexion' => $formFields['complexion'],
-          'weight' => $formFields['weight'],
-          'feet' => $formFields['feet'],
-          'inch' => $formFields['inch'],
-          'motherLanguage' => $formFields['motherLanguage'],
-          'requirements' => $formFields['requirements'],
-          'noOfSons' => $formFields['noOfSons'],
-          'noOfDaughters' => $formFields['noOfDaughters'],
-          'userId' => $formFields['userId'],
-          'headType' => $formFields['headType'],
-          'smoker' => $formFields['smoker'], 
-          'drinker' => $formFields['drinker'], 
-          'childProducer' => $formFields['childProducer'], 
-          'father' => $formFields['father'], 
-          'mother' => $formFields['mother'],
-          'sisters' => $formFields['sisters'], 
-          'marriedSisters' => $formFields['marriedSisters'], 
-          'brothers' => $formFields['brothers'], 
-          'marriedBrothers' => $formFields['marriedBrothers'], 
-          'siblingNumber' => $formFields['siblingNumber'], 
-          'currentAddessArea' => $formFields['currentAddessArea'],  
-          'currentAddessCity' => $formFields['currentAddessCity'],  
-          'currentAddessCountry' => $formFields['currentAddessCountry'],  
-          'permanentAddessArea' => $formFields['permanentAddessArea'],  
-          'permanentAddessCity' => $formFields['permanentAddessCity'],  
-          'permanentAddessCountry' => $formFields['permanentAddessCountry'],
         ]);
-        $updateUserProfileScore = app('App\Http\Controllers\UserController')->updateProfileScore($formFields['userId']);
-
-        $response = [
-          'type' => 'success',
-          'profileScore' => 80,
-          'message' => 'Profile created Successfully'
-        ];
-        return response ($response);
+        $response = $this->createStepFamily($formFields);
+        return response($response);
+      } else if($request->step === 'others'){
+        $formFields = $request->validate([
+          'requirements' => 'required',
+          'smoker' => 'required',
+          'drinker' => 'required',
+          'childProducer' => 'required',
+        ]);
+        $response = $this->createStepOthers($formFields);
+        return response($response);
       }
     }
 
-    public function updateProfileScore($id){
-      $updateProfileScore = User::where('id', $id)->update(['profileSCore' => 80]);
+    public function updateProfileScore($id, $score){
+      $updateProfileScore = User::where('id', $id)->update(['profileSCore' => $score]);
       if($updateProfileScore) {
         return true;
       } else {
@@ -147,8 +134,6 @@ class ProfileController extends Controller {
       $profileId = $request->route('id');
 
       $updateFields = [
-        'fullName' => $request->fullName,
-        'profileType' => $request->profileType,
         'contactNo' => $request->contactNo,
         'professionType' => $request->professionType,
         'professionTitle' => $request->professionTitle,
@@ -209,11 +194,12 @@ class ProfileController extends Controller {
     public function deleteProfileById($id){
       $profileDeleted = Profile::where('userId', $id)->delete();
       if($profileDeleted === 1){
-          $response = [
-              'type' => 'success',
-              'message' => 'User deleted successfuly'
-          ];
-          return response($userDeleted);
+        this.updateProfileScore($id, 0);
+        $response = [
+            'type' => 'success',
+            'message' => 'User deleted successfuly'
+        ];
+        return response($response);
       } else {
           $response = [
               'type' => 'error',
@@ -222,4 +208,86 @@ class ProfileController extends Controller {
           return response($response);
       }
     }
+
+    public function createStepLogin($loginData){
+      $user = User::create([
+        'fullName' => $loginData['fullName'],
+        'gender' => $loginData['gender'],
+        'email' => $loginData['email'],
+        'password' => bcrypt($loginData['password']),
+        'profileScore' => 20
+      ]);
+      $token = $user->createToken('myapptoken')->plainTextToken;
+      $response = [
+          'type' => 'success',
+          'token' => $token,
+          'user' => $user
+      ];
+      return $response;
+    }
+    public function createStepPersonal($personalData){
+      $personal = Personal::create($personalData);
+      $response = [
+        'type' => 'success',
+        'personal' => $personal
+      ];
+      return $response;
+    }
+    public function createStepProfession($professionData){
+      $profession = Profession::create($professionData);
+      $response = [
+        'type' => 'success',
+        'profession' => $profession
+      ];
+      return $response;
+    }
+    public function createStepEducation($educationData){
+      $education = Education::create($educationData);
+      $response = [
+          'type' => 'success',
+          'education' => $education
+      ];
+      return $response;
+    }
+    public function createStepReligion($religionData){
+      $religion = Religion::create($religionData);
+      $response = [
+          'type' => 'success',
+          'religion' => $religion
+      ];
+      return $response;
+    }
+    public function createStepAppearance($appearanceData){
+      $appearance = Appearance::create($appearanceData);
+      $response = [
+          'type' => 'success',
+          'appearance' => $appearance
+      ];
+      return $response;
+    }
+    public function createStepLocation($locationData){
+      $location = Location::create($locationData);
+      $response = [
+          'type' => 'success',
+          'location' => $location
+      ];
+      return $response;
+    }
+    public function createStepFamily($familyData){
+      $family = Family::create($familyData);
+      $response = [
+          'type' => 'success',
+          'family' => $family
+      ];
+      return $response;
+    }
+    public function createStepOthers($othersData){
+      $others = Others::create($othersData);
+      $response = [
+          'type' => 'success',
+          'others' => $others
+      ];
+      return $response;
+    }
 }
+
